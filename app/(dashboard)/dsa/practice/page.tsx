@@ -119,12 +119,12 @@ export default function DSAPracticePage() {
             <p>{problem?.description}</p>
 
             <h4 className="font-semibold mt-4 text-white">Example 1:</h4>
-            <pre className="bg-[#0F172A] p-3 rounded-md text-sm text-slate-300 border border-white/5">{problem?.examples[0]}</pre>
+            <pre className="bg-[#0F172A] p-3 rounded-md text-sm text-slate-300 border border-white/5">{problem?.examples?.[0] || "No example provided"}</pre>
 
-            {problem?.examples[1] && (
+            {problem?.examples?.[1] && (
               <>
                 <h4 className="font-semibold mt-4 text-white">Example 2:</h4>
-                <pre className="bg-[#0F172A] p-3 rounded-md text-sm text-slate-300 border border-white/5">{problem?.examples[1]}</pre>
+                <pre className="bg-[#0F172A] p-3 rounded-md text-sm text-slate-300 border border-white/5">{problem?.examples?.[1]}</pre>
               </>
             )}
           </div>

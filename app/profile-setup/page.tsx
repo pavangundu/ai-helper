@@ -75,15 +75,17 @@ export default function ProfileSetupPage() {
       })
 
       if (!genRes.ok) {
-        console.error("Roadmap generation failed")
+        const errorData = await genRes.json();
+        console.error("Roadmap generation failed:", errorData);
+        throw new Error(errorData.error || "Roadmap generation failed");
       }
 
       toast.success("Profile setup complete! Redirecting...")
       // Navigate to Dashboard (where roadmap generation will trigger or be shown)
       router.push("/dashboard")
 
-    } catch (error) {
-      toast.error("Something went wrong. Please try again.")
+    } catch (error: any) {
+      toast.error(`Error: ${error.message || "Something went wrong"}`);
       console.error(error)
     } finally {
       setLoading(false)

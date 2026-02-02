@@ -68,14 +68,7 @@ export default function AptitudePracticePage() {
     setSubmitted(true)
 
     if (percentage >= 70) {
-      toast.success(`You passed with ${percentage}%! Task marked complete.`)
-      // Call the completion API directly here? 
-      // Or just redirect back to dashboard where user clicks "Done"?
-      // The prompt said "Implement Validation Logic". 
-      // Better to AUTO-COMPLETE if possible, or tell user they can now click done.
-      // Let's just track it locally or tell the user. 
-      // Ideally, we accept a 'taskId' param to update. 
-      // For now, we'll just show the success state.
+      toast.success(`You passed with ${percentage}%!`)
     } else {
       toast.error(`You scored ${percentage}%. You need 70% to pass.`)
     }

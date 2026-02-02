@@ -9,7 +9,7 @@ if (!apiKey) {
 
 const genAI = new GoogleGenerativeAI(apiKey || "");
 
-// Use the model verified to work
+// "gemini-2.5-flash" is confirmed available for this user key
 export const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 export interface UserProfile {
@@ -29,6 +29,23 @@ export async function generateRoadmap(profile: UserProfile) {
     
     IMPORTANT: You must generate a roadmap for the ENTIRE duration (${profile.goalTimeline}). 
     If 3 months, generate 3 months. If 6 months, generate 6 months.
+
+    STRICT SYLLABUS (Select topics from here):
+    
+    1. APTITUDE (Arithmetic & Reasoning):
+       - Arithmetic: Time & Distance, Percentages, SI/CI, Profit & Loss, Partnership, Ratio & Proportion, Time & Work, Averages, Mixture & Alligation.
+       - Reasoning: Number Series, Coding & Decoding, Directions, Seating Arrangement, Blood Relations, Clocks, Calendars, Counting Figures, Mirror Images, Charts, Simplifications.
+    
+    2. DSA (Data Structures & Algorithms):
+       - Basics, Sorting (Bubble/Merge/Quick), Arrays, Binary Search, Strings, Linked Lists, Recursion, Bit Manipulation, Stack & Queue, Sliding Window, Heaps, Greedy, Trees, BST, Graphs, DP, Tries.
+
+    3. CORE SKILL:
+       - Specific to "${profile.coreSkill}" (e.g. if Python -> Syntax, OOPs, Django, etc).
+
+    Ensure:
+    - "aptitudeTask": Must be from the APTITUDE list above. (NOT Code).
+    - "dsaTask": Must be from the DSA list above.
+    - "coreTask": Specific to ${profile.coreSkill}.
     
     Output JSON with this structure:
     {
@@ -45,9 +62,9 @@ export async function generateRoadmap(profile: UserProfile) {
                   "day": 1,
                   "title": "Task Title",
                   "description": "Brief description",
-                  "aptitudeTask": "Topic: subtopic - activity",
-                  "dsaTask": "Topic: subtopic - activity",
-                  "coreTask": "Topic: subtopic - activity",
+                  "aptitudeTask": "Topic: General Aptitude / Logic / Verbal (NOT technical code)",
+                  "dsaTask": "Topic: Data Structures & Algorithms",
+                  "coreTask": "Topic: Core Tech Stack (e.g. React, Python)",
                   "resources": []
                 }
               ]

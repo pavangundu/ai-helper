@@ -1,5 +1,6 @@
 
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle, Target, Trophy, Clock, Sparkles } from "lucide-react";
 
@@ -57,17 +58,15 @@ export default function Home() {
             </Button>
           </div>
 
-          <div className="mt-20 w-full max-w-6xl aspect-video rounded-2xl border border-white/10 bg-[#1E293B]/40 backdrop-blur-sm shadow-2xl relative overflow-hidden group">
-            {/* Abstract placeholder or screenshot for now */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-slate-500 gap-4">
-              <div className="w-20 h-20 rounded-full bg-slate-800/50 flex items-center justify-center">
-                <Target className="w-10 h-10 opacity-50" />
-              </div>
-              <span className="text-sm font-medium tracking-widest uppercase">Dashboard Preview</span>
+          <div className="mt-20 w-full max-w-6xl rounded-2xl border border-white/10 bg-[#1E293B]/40 backdrop-blur-sm shadow-2xl relative overflow-hidden group">
+            <div className="relative aspect-video w-full">
+              <Image
+                src="/dashboard-real.png"
+                alt="Dashboard Preview"
+                fill
+                className="object-cover"
+              />
             </div>
-
-            {/* UI Mockup Placeholder Stripes */}
-            <div className="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-[#0F172A] to-transparent opacity-80" />
           </div>
         </section>
 

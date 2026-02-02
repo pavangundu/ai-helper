@@ -20,7 +20,18 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const roadmap = await Roadmap.findOne({ userId: user._id as string, status: 'active' });
+    // RETROACTIVE BADGE CHECK
+    let badgeUpdated = false;
+    if (user.streak >= 7 && !user.badges.includes("streak_7")) {
+      user.badges.push("streak_7");
+      badgeUpdated = true;
+    }
+    if (badgeUpdated) {
+      await user.save();
+    }
+
+    // Fix query type: Force cast to any to bypass strict type check on filter
+    const roadmap = await Roadmap.findOne({ userId: user._id as any, status: 'active' });
 
     let currentTask = null;
 
@@ -60,7 +71,9 @@ export async function GET(req: Request) {
         streak: user.streak,
         shields: user.shields,
         points: user.points,
-        name: user.name
+        name: user.name,
+        badges: user.badges, // Return badges
+        image: user.image
       },
       roadmapId: (roadmap as any)?._id,
       currentTask

@@ -20,9 +20,9 @@ export async function POST(req: Request) {
     }
 
     // Check if roadmap already exists
-    const existingRoadmap = await Roadmap.findOne({ userId: user._id, status: 'active' });
+    const existingRoadmap = await Roadmap.findOne({ userId: user._id as any, status: 'active' });
     if (existingRoadmap) {
-      return NextResponse.json({ message: "Roadmap already exists", roadmapId: existingRoadmap._id }, { status: 200 });
+      return NextResponse.json({ message: "Roadmap already exists", roadmapId: (existingRoadmap as any)._id }, { status: 200 });
     }
 
     // Generate Roadmap via AI
@@ -38,19 +38,19 @@ export async function POST(req: Request) {
 
     // Save to DB
     const newRoadmap = await Roadmap.create({
-      userId: user._id,
+      userId: user._id as any,
       role: user.targetRole,
       months: roadmapData.months
     });
 
     return NextResponse.json(
-      { message: "Roadmap generated successfully", roadmapId: newRoadmap._id },
+      { message: "Roadmap generated successfully", roadmapId: (newRoadmap as any)._id },
       { status: 201 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Roadmap Generation API Error:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: error.message || "Internal Server Error" },
       { status: 500 }
     );
   }

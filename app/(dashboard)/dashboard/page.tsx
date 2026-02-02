@@ -4,9 +4,12 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Zap, Shield, Brain, Code, Terminal, ChevronRight, MessageSquare, BarChart3, Percent, TrendingUp, Coins, Bot, CheckCircle, Clock, Binary, Users, Map } from "lucide-react"
+import { Zap, Shield, Brain, Code, Terminal, ChevronRight, MessageSquare, BarChart3, Percent, TrendingUp, Coins, Bot, CheckCircle, Clock, Binary, Users, Map, Hourglass, CircleDollarSign, Gauge, Hash, Compass } from "lucide-react"
 import { ProgressRing } from "@/components/ui/progress-ring"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
@@ -119,16 +122,13 @@ export default function DashboardPage() {
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 p-[2px]">
-            <div className="w-full h-full rounded-full bg-[#0B1120] flex items-center justify-center overflow-hidden relative">
-              {user?.name && (
-                <Image
-                  src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name}`}
-                  alt="User"
-                  fill
-                  className="object-cover"
-                />
-              )}
-            </div>
+            <Avatar className="w-full h-full border-4 border-[#0B1120]">
+              <AvatarImage src={user?.image} className="object-cover" />
+              <AvatarImage src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.name}`} className="object-cover" />
+              <AvatarFallback className="bg-slate-800 text-white text-lg font-bold">
+                {user?.name?.charAt(0).toUpperCase() || "U"}
+              </AvatarFallback>
+            </Avatar>
           </div>
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-white">Hello, {user?.name?.split(' ')[0]}!</h1>
@@ -301,13 +301,13 @@ export default function DashboardPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
                 { title: "Percentages", icon: Percent, color: "text-green-400", bg: "bg-green-400/10" },
-                { title: "Time & Work", icon: Clock, color: "text-blue-400", bg: "bg-blue-400/10" },
-                { title: "Profit & Loss", icon: Coins, color: "text-yellow-400", bg: "bg-yellow-400/10" },
-                { title: "Time Speed Distance", icon: BarChart3, color: "text-orange-400", bg: "bg-orange-400/10" },
-                { title: "Number Series", icon: Binary, color: "text-purple-400", bg: "bg-purple-400/10" },
+                { title: "Time & Work", icon: Hourglass, color: "text-blue-400", bg: "bg-blue-400/10" },
+                { title: "Profit & Loss", icon: CircleDollarSign, color: "text-yellow-400", bg: "bg-yellow-400/10" },
+                { title: "Time Speed Distance", icon: Gauge, color: "text-orange-400", bg: "bg-orange-400/10" },
+                { title: "Number Series", icon: Hash, color: "text-purple-400", bg: "bg-purple-400/10" },
                 { title: "Coding Decoding", icon: Code, color: "text-pink-400", bg: "bg-pink-400/10" },
                 { title: "Blood Relations", icon: Users, color: "text-red-400", bg: "bg-red-400/10" },
-                { title: "Direction Sense", icon: Map, color: "text-teal-400", bg: "bg-teal-400/10" }
+                { title: "Direction Sense", icon: Compass, color: "text-teal-400", bg: "bg-teal-400/10" }
               ].map((item, i) => (
                 <div key={i} className="bg-[#1E293B]/40 hover:bg-[#1E293B] border border-white/5 hover:border-blue-500/30 p-5 rounded-2xl transition-all cursor-pointer group space-y-3"
                   onClick={() => router.push(`/aptitude/practice?topic=${encodeURIComponent(item.title)}`)}>
@@ -321,6 +321,54 @@ export default function DashboardPage() {
             </div>
           </div>
 
+          {/* 4. Achievements & Badges Section */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              Achievements & Badges
+              <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse"></span>
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { id: "streak_7", title: "Week Warrior", desc: "7 Day Streak", icon: Zap, color: "text-orange-400", bg: "bg-orange-400/10", border: "border-orange-500/30" },
+                { id: "quiz_master", title: "Quiz Wizard", desc: "Scored 100% in Aptitude", icon: Brain, color: "text-blue-400", bg: "bg-blue-400/10", border: "border-blue-500/30" },
+                { id: "dsa_solver", title: "DSA Crusher", desc: "Solved 10 DSA Problems", icon: Code, color: "text-purple-400", bg: "bg-purple-400/10", border: "border-purple-500/30" },
+                { id: "early_bird", title: "Early Bird", desc: "Completed tasks before 9AM", icon: Clock, color: "text-yellow-400", bg: "bg-yellow-400/10", border: "border-yellow-500/30" },
+              ].map((badge, i) => {
+                const isUnlocked = user?.badges?.includes(badge.id);
+                return (
+                  <div key={i} className={cn(
+                    "relative p-5 rounded-2xl border transition-all space-y-3 overflow-hidden group",
+                    isUnlocked
+                      ? `bg-[#1E293B]/60 ${badge.border} shadow-lg shadow-${badge.color.split('-')[1]}-500/10`
+                      : "bg-[#1E293B]/20 border-white/5 opacity-60 grayscale hover:grayscale-0 hover:opacity-100"
+                  )}>
+                    {isUnlocked && (
+                      <div className={`absolute top-0 right-0 p-1.5 rounded-bl-xl ${badge.bg} border-b border-l ${badge.border}`}>
+                        <CheckCircle className={`w-3 h-3 ${badge.color}`} />
+                      </div>
+                    )}
+
+                    <div className={`w-12 h-12 rounded-xl ${isUnlocked ? badge.bg : "bg-slate-800"} flex items-center justify-center`}>
+                      <badge.icon className={`w-6 h-6 ${isUnlocked ? badge.color : "text-slate-500"}`} />
+                    </div>
+
+                    <div>
+                      <h3 className={`font-semibold ${isUnlocked ? "text-slate-200" : "text-slate-500"}`}>{badge.title}</h3>
+                      <p className="text-xs text-slate-500 mt-1">{badge.desc}</p>
+                    </div>
+
+                    {isUnlocked ? (
+                      <Badge variant="outline" className={`text-[10px] ${badge.color} ${badge.bg} border-0`}>Unlocked</Badge>
+                    ) : (
+                      <Badge variant="outline" className="text-[10px] text-slate-600 border-slate-800">Locked</Badge>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
         </div>
 
         {/* RIGHT COLUMN (1/3 width) */}
@@ -331,18 +379,18 @@ export default function DashboardPage() {
             <CardHeader>
               <CardTitle className="text-lg">Progress Overview</CardTitle>
             </CardHeader>
-            <CardContent className="flex justify-between items-center px-4">
-              <div className="flex flex-col items-center gap-2">
-                <ProgressRing progress={45} radius={36} stroke={6} color="text-blue-500" label="45%" />
-                <span className="text-xs text-slate-400 font-medium pt-2">Aptitude</span>
+            <CardContent className="flex justify-around items-center px-4 py-8">
+              <div className="flex flex-col items-center gap-3">
+                <ProgressRing progress={45} radius={42} stroke={6} color="text-blue-500" label="45%" />
+                <span className="text-sm font-semibold text-slate-300 tracking-wide">Aptitude</span>
               </div>
-              <div className="flex flex-col items-center gap-2">
-                <ProgressRing progress={60} radius={36} stroke={6} color="text-purple-500" label="60%" />
-                <span className="text-xs text-purple-400 font-medium pt-2">DSA</span>
+              <div className="flex flex-col items-center gap-3">
+                <ProgressRing progress={60} radius={42} stroke={6} color="text-purple-500" label="60%" />
+                <span className="text-sm font-semibold text-purple-300 tracking-wide">DSA</span>
               </div>
-              <div className="flex flex-col items-center gap-2">
-                <ProgressRing progress={70} radius={36} stroke={6} color="text-green-500" label="70%" />
-                <span className="text-xs text-slate-400 font-medium pt-2">Core</span>
+              <div className="flex flex-col items-center gap-3">
+                <ProgressRing progress={70} radius={42} stroke={6} color="text-emerald-500" label="70%" />
+                <span className="text-sm font-semibold text-emerald-300 tracking-wide">Core</span>
               </div>
             </CardContent>
           </Card>

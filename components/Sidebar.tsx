@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, BookOpen, Code2, GraduationCap, Map, Bot, Shield, Settings } from "lucide-react"
+import { LayoutDashboard, BookOpen, Code2, GraduationCap, Map, Bot, Shield, Settings, FileText } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const sidebarLinks = [
@@ -11,6 +11,7 @@ const sidebarLinks = [
   { href: "/aptitude", label: "Aptitude", icon: BookOpen },
   { href: "/dsa/practice", label: "DSA", icon: Code2 },
   { href: "/core-skills", label: "Core Skills", icon: GraduationCap },
+  { href: "/resume", label: "Resume Builder", icon: FileText },
   { href: "/mentor", label: "AI Mentor", icon: Bot },
 ]
 
@@ -64,9 +65,9 @@ export function Sidebar() {
           </div>
           <Link
             href="/settings"
-            className="flex items-center gap-2 text-xs text-slate-500 hover:text-slate-300 mt-4 px-1 transition-colors"
+            className="flex items-center gap-2 text-sm text-slate-400 hover:text-white mt-4 px-1 transition-colors"
           >
-            <Settings className="w-3 h-3" /> Preferences
+            <Settings className="w-4 h-4" /> Preferences
           </Link>
         </div>
       </div>

@@ -1,4 +1,3 @@
-
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import { User } from "@/models/User";
@@ -15,7 +14,6 @@ export async function POST(req: Request) {
     if (!roadmap) return NextResponse.json({ error: "Roadmap not found" }, { status: 404 });
 
     // 2. Find the specific day task object
-    // Mongoose nested array update is tricky, we'll do it in JS for prototype stability
     const mIndex = roadmap.months.findIndex((m: any) => m.month === month);
     const wIndex = roadmap.months[mIndex].weeks.findIndex((w: any) => w.week === week);
     const dIndex = roadmap.months[mIndex].weeks[wIndex].dailyTasks.findIndex((d: any) => d.day === day);
@@ -26,13 +24,7 @@ export async function POST(req: Request) {
 
     const taskDay = roadmap.months[mIndex].weeks[wIndex].dailyTasks[dIndex];
 
-    // 3. Mark specific subtask as done (we simply assume it's done for this prototype)
-    // In a real app we'd have specific boolean flags for 'aptitudeCompleted', 'dsaCompleted', etc.
-    // BUT our schema currently only has `isCompleted` for the WHOLE day.
-    // Let's IMPROVE the schema dynamically or just use a workaround.
-    // Workaround: We will use the `resources` array to store "completed_aptitude", "completed_dsa" flags strictly for this hackathon prototype
-    // This avoids schema migration headaches right now.
-
+    // 3. Mark specific subtask as done
     const flag = `completed_${taskType}`;
     if (!taskDay.resources) taskDay.resources = [];
 
@@ -48,12 +40,11 @@ export async function POST(req: Request) {
     let streakIncremented = false;
 
     if (isAptitudeDone && isDsaDone && isCoreDone && !taskDay.isCompleted) {
-      taskDay.isCompleted = true;
+      taskDay.isCompleted = true; // Mark full day as complete
 
-      // Increment user streak
+      // Streak Logic: ONLY runs when the FULL DAY is completed
       const user = await User.findOne({ email });
       if (user) {
-        // Check if streak was already incremented today
         const today = new Date();
         const lastInc = user.lastStreakIncrement ? new Date(user.lastStreakIncrement) : null;
 
@@ -66,31 +57,43 @@ export async function POST(req: Request) {
           user.streak = (user.streak || 0) + 1;
           user.lastStreakIncrement = today;
           streakIncremented = true;
+
+          // Badge: Week Warrior (7 Day Streak)
+          if (user.streak >= 7 && !user.badges.includes("streak_7")) {
+            user.badges.push("streak_7");
+          }
         }
 
-        user.points = (user.points || 0) + 50;
+        // Badge: Early Bird (Finished before 9 AM)
+        const currentHour = new Date().getHours();
+        if (currentHour < 9 && !user.badges.includes("early_bird")) {
+          user.badges.push("early_bird");
+        }
+
+        user.points = (user.points || 0) + 50; // Bonus for full day
         await user.save();
       }
     }
 
-    // Always update study time regardless of streak/day completion
+    // Always update study time (Points for individual tasks could be added here if desired, keeping it simple for now)
     const user = await User.findOne({ email });
     if (user) {
-      // Initialize if missing
       if (!user.totalStudyTime) {
         user.totalStudyTime = { aptitude: 0, dsa: 0, core: 0 };
       }
-
-      // Add estimated time (Aptitude: 10m, DSA: 20m, Core: 30m)
       if (taskType === "aptitude") user.totalStudyTime.aptitude += 10;
       if (taskType === "dsa") user.totalStudyTime.dsa += 20;
       if (taskType === "core") user.totalStudyTime.core += 30;
+
+      // Individual task points? User said "only 1 streak boost... points" logic is vague but user focused on streak.
+      // Reverting to previous state where maybe points were added? 
+      // Safe to give small points for activity, but streak is strictly gated.
+      user.points = (user.points || 0) + 10;
 
       await user.save();
     }
 
     // Save roadmap
-    // Note: We need to mark modified because we touched deep arrays
     roadmap.markModified('months');
     await roadmap.save();
 
