@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { model } from "@/lib/gemini";
+import { getGeminiModel } from "@/lib/gemini";
 import dbConnect from "@/lib/db";
 import { User } from "@/models/User";
 import { Roadmap } from "@/models/Roadmap";
@@ -21,7 +21,7 @@ export async function POST(req: Request) {
         userContext += `User Name: ${user.name}\nTarget Role: ${user.targetRole}\nCurrent Level: ${user.currentLevel}\nStreak: ${user.streak} days\n`;
 
         // Get today's task from active roadmap if exists
-        const roadmap = await Roadmap.findOne({ userId: user._id, status: 'active' });
+        const roadmap = await Roadmap.findOne({ userId: user._id as any, status: 'active' });
         if (roadmap) {
           userContext += `They are following a ${user.goalTimeline} roadmap.\n`;
         }
@@ -53,6 +53,7 @@ export async function POST(req: Request) {
       `;
 
     console.log("Mentor Chat: Calling Gemini...");
+    const model = getGeminiModel();
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();

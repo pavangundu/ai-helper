@@ -2,7 +2,6 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/db";
 import { User } from "@/models/User";
-
 import { Roadmap } from "@/models/Roadmap";
 
 export async function PATCH(req: Request) {
@@ -38,16 +37,16 @@ export async function PATCH(req: Request) {
     }
 
     // Delete existing roadmaps to trigger regeneration
-    await Roadmap.deleteMany({ userId: user._id });
+    await Roadmap.deleteMany({ userId: user._id as any });
 
     return NextResponse.json(
       { message: "Profile updated and progress reset successfully", user },
       { status: 200 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Profile Update Error:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: `Profile Update Failed: ${error.message}` },
       { status: 500 }
     );
   }

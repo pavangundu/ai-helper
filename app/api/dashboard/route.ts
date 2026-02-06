@@ -66,6 +66,34 @@ export async function GET(req: Request) {
       }
     }
 
+    // CALCULATE PROGRESS
+    let totalDays = 0;
+    let completedAptitude = 0;
+    let completedDsa = 0;
+    let completedCore = 0;
+
+    if (roadmap && roadmap.months) {
+      for (const month of roadmap.months) {
+        if (!month.weeks) continue;
+        for (const week of month.weeks) {
+          if (!week.dailyTasks) continue;
+          for (const day of week.dailyTasks) {
+            totalDays++;
+            const res = day.resources || [];
+            if (res.includes("completed_aptitude")) completedAptitude++;
+            if (res.includes("completed_dsa")) completedDsa++;
+            if (res.includes("completed_core")) completedCore++;
+          }
+        }
+      }
+    }
+
+    const progress = {
+      aptitude: totalDays > 0 ? Math.round((completedAptitude / totalDays) * 100) : 0,
+      dsa: totalDays > 0 ? Math.round((completedDsa / totalDays) * 100) : 0,
+      core: totalDays > 0 ? Math.round((completedCore / totalDays) * 100) : 0
+    };
+
     return NextResponse.json({
       user: {
         streak: user.streak,
@@ -73,10 +101,12 @@ export async function GET(req: Request) {
         points: user.points,
         name: user.name,
         badges: user.badges, // Return badges
-        image: user.image
+        image: user.image,
+        totalStudyTime: user.totalStudyTime
       },
       roadmapId: (roadmap as any)?._id,
-      currentTask
+      currentTask,
+      progress
     });
 
   } catch (error) {

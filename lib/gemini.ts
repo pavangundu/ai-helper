@@ -1,16 +1,15 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const apiKey = process.env.GEMINI_API_KEY;
-
-if (!apiKey) {
-  console.warn("GEMINI_API_KEY is not defined in environment variables");
+export function getGeminiModel(apiKey?: string) {
+  const key = apiKey || process.env.GEMINI_API_KEY;
+  if (!key) {
+    throw new Error("No API Key provided. Please set GEMINI_API_KEY env var or pass it dynamically.");
+  }
+  const genAI = new GoogleGenerativeAI(key);
+  // "gemini-2.5-flash" is confirmed available for this user key
+  return genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 }
-
-const genAI = new GoogleGenerativeAI(apiKey || "");
-
-// "gemini-2.5-flash" is confirmed available for this user key
-export const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
 export interface UserProfile {
   targetRole: string;
@@ -20,7 +19,7 @@ export interface UserProfile {
   goalTimeline: string;
 }
 
-export async function generateRoadmap(profile: UserProfile) {
+export async function generateRoadmap(profile: UserProfile, apiKey?: string) {
   // We limit to 1 month for now to avoid token limits, or we use 1.5-flash which handles more.
   // Let's ask for the full timeline but keep descriptions concise.
   const prompt = `
@@ -81,6 +80,7 @@ export async function generateRoadmap(profile: UserProfile) {
     `;
 
   try {
+    const model = getGeminiModel(apiKey);
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();

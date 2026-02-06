@@ -1,6 +1,6 @@
 
 import { NextResponse } from "next/server";
-import { model } from "@/lib/gemini";
+import { getGeminiModel } from "@/lib/gemini";
 
 export async function POST(req: Request) {
   try {
@@ -24,6 +24,7 @@ export async function POST(req: Request) {
     }
     `;
 
+    const model = getGeminiModel();
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();

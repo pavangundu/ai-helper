@@ -2,7 +2,7 @@
 "use client"
 
 import { useSearchParams } from "next/navigation"
-import { useEffect, useState } from "react"
+import { useEffect, useState, Suspense } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Loader2, Play, Lightbulb, RefreshCcw } from "lucide-react"
 import { toast } from "sonner"
 
-export default function DSAPracticePage() {
+function PracticeContent() {
   const searchParams = useSearchParams()
   const topic = searchParams.get('topic') || "General"
 
@@ -186,5 +186,13 @@ export default function DSAPracticePage() {
         </Tabs>
       </Card>
     </div>
+  )
+}
+
+export default function DSAPracticePage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center items-center h-[50vh]"><Loader2 className="animate-spin" /></div>}>
+      <PracticeContent />
+    </Suspense>
   )
 }

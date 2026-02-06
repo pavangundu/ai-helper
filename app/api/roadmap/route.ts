@@ -20,13 +20,42 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const roadmap = await Roadmap.findOne({ userId: user._id, status: 'active' });
+    const roadmap = await Roadmap.findOne({ userId: user._id as any, status: 'active' });
 
     if (!roadmap) {
       return NextResponse.json({ error: "Roadmap not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ roadmap });
+    // Calculate overall progress
+    let totalSubTasks = 0;
+    let completedSubTasks = 0;
+
+    if (roadmap.months) {
+      for (const month of roadmap.months) {
+        if (!month.weeks) continue;
+        for (const week of month.weeks) {
+          if (!week.dailyTasks) continue;
+          for (const day of week.dailyTasks) {
+            // Each day has 3 tasks: Aptitude, DSA, Core
+            totalSubTasks += 3;
+
+            const res = day.resources || [];
+            if (res.includes("completed_aptitude")) completedSubTasks++;
+            if (res.includes("completed_dsa")) completedSubTasks++;
+            if (res.includes("completed_core")) completedSubTasks++;
+          }
+        }
+      }
+    }
+
+    const percentCompleted = totalSubTasks > 0
+      ? Math.round((completedSubTasks / totalSubTasks) * 100)
+      : 0;
+
+    return NextResponse.json({
+      roadmap,
+      percentCompleted
+    });
 
   } catch (error) {
     console.error("Roadmap Fetch Error:", error);

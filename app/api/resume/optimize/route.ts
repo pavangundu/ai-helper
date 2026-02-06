@@ -1,18 +1,18 @@
-  import { model } from "@/lib/gemini";
-  import { NextResponse } from "next/server";
+import { getGeminiModel } from "@/lib/gemini";
+import { NextResponse } from "next/server";
 
-  export async function POST(req: Request) {
-    try {
-      const { resumeData, jobDescription } = await req.json();
+export async function POST(req: Request) {
+  try {
+    const { resumeData, jobDescription } = await req.json();
 
-      if (!resumeData || !jobDescription) {
-        return NextResponse.json(
-          { error: "Missing resume data or job description" },
-          { status: 400 }
-        );
-      }
+    if (!resumeData || !jobDescription) {
+      return NextResponse.json(
+        { error: "Missing resume data or job description" },
+        { status: 400 }
+      );
+    }
 
-      const prompt = `
+    const prompt = `
         You are an expert Resume Optimizer. Your task is to tailor the provided Resume JSON to the specific Job Description (JD).
 
         **JOB DESCRIPTION:**
@@ -41,29 +41,30 @@
         - Ensure 'points' in projects is ALWAYS an array of strings.
       `;
 
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
+    const model = getGeminiModel();
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
 
-      console.log("AI Raw Response:", text);
+    console.log("AI Raw Response:", text);
 
-      // Cleanup markdown if present
-      const cleanedText = text.replace(/```json/g, "").replace(/```/g, "").trim();
+    // Cleanup markdown if present
+    const cleanedText = text.replace(/```json/g, "").replace(/```/g, "").trim();
 
-      // Validate JSON
-      try {
-        const optimizedResume = JSON.parse(cleanedText);
-        return NextResponse.json(optimizedResume);
-      } catch (e) {
-        console.error("Failed to parse AI response:", text);
-        return NextResponse.json({ error: "AI produced invalid JSON. Check server logs." }, { status: 500 });
-      }
-
-    } catch (error: any) {
-      console.error("Optimization Error:", error);
-      return NextResponse.json(
-        { error: error.message || "Failed to optimize resume" },
-        { status: 500 }
-      );
+    // Validate JSON
+    try {
+      const optimizedResume = JSON.parse(cleanedText);
+      return NextResponse.json(optimizedResume);
+    } catch (e) {
+      console.error("Failed to parse AI response:", text);
+      return NextResponse.json({ error: "AI produced invalid JSON. Check server logs." }, { status: 500 });
     }
+
+  } catch (error: any) {
+    console.error("Optimization Error:", error);
+    return NextResponse.json(
+      { error: error.message || "Failed to optimize resume" },
+      { status: 500 }
+    );
   }
+}

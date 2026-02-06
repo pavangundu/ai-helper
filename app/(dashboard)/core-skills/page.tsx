@@ -163,7 +163,7 @@ export default function CoreSkillsPage() {
                 <>
                   <div>
                     <h2 className="text-3xl font-bold text-white mb-2">
-                      {currentTask.coreTask.split(":")[0]}
+                      {currentTask.coreTask.replace(":", " -")}
                     </h2>
                     <p className="text-slate-400 text-lg leading-relaxed">
                       {/* Extract description if available or generic text */}
@@ -181,7 +181,11 @@ export default function CoreSkillsPage() {
                         Mark Topic Learned
                       </Button>
                     )}
-                    <Button variant="outline" className="border-slate-700 text-slate-300 hover:text-white hover:bg-white/5">
+                    <Button
+                      variant="outline"
+                      className="border-slate-700 text-slate-300 hover:text-white hover:bg-white/5"
+                      onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(currentTask.coreTask.replace(":", " ") + " documentation")}`, "_blank")}
+                    >
                       <BookOpen className="w-4 h-4 mr-2" /> Read Docs
                     </Button>
                   </div>
@@ -227,18 +231,28 @@ export default function CoreSkillsPage() {
               <CardTitle className="text-lg">Skill Mastery</CardTitle>
             </CardHeader>
             <CardContent className="flex flex-col items-center">
-              <ProgressRing
-                radius={70}
-                stroke={8}
-                progress={user?.totalStudyTime?.core ? Math.min(100, user.totalStudyTime.core / 10) : 15}
-                color="text-emerald-500"
-                label={`${user?.totalStudyTime?.core || 0}h`}
-                subLabel="STUDIED"
-                className="scale-110"
-              />
-              <p className="text-center text-sm text-slate-400 mt-6 px-4">
-                You've spent {user?.totalStudyTime?.core || 0} hours mastering {userSkill}. Keep pushing!
-              </p>
+              {(() => {
+                const minutes = user?.totalStudyTime?.core || 0;
+                const hours = (minutes / 60).toFixed(1);
+                const progress = Math.min(100, (minutes / 60 / 50) * 100); // Goal: 50 Hours
+
+                return (
+                  <>
+                    <ProgressRing
+                      radius={70}
+                      stroke={8}
+                      progress={progress}
+                      color="text-emerald-500"
+                      label={`${hours}h`}
+                      subLabel="STUDIED"
+                      className="scale-110"
+                    />
+                    <p className="text-center text-sm text-slate-400 mt-6 px-4">
+                      You've spent {hours} hours mastering {userSkill}. Keep pushing!
+                    </p>
+                  </>
+                );
+              })()}
             </CardContent>
           </Card>
 

@@ -2,8 +2,21 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { LayoutDashboard, BookOpen, Code2, GraduationCap, Map, Bot, Shield, Settings, FileText } from "lucide-react"
+import {
+  LayoutDashboard,
+  BookOpen,
+  Code2,
+  GraduationCap,
+  Map,
+  Bot,
+  Shield,
+  Settings,
+  FileText,
+  LogOut,
+  Trash2
+} from "lucide-react"
 import { cn } from "@/lib/utils"
+import { ApiKeyDialog } from "@/components/ApiKeyDialog"
 
 const sidebarLinks = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -69,6 +82,42 @@ export function Sidebar() {
           >
             <Settings className="w-4 h-4" /> Preferences
           </Link>
+          <button
+            onClick={() => {
+              localStorage.removeItem("user")
+              localStorage.removeItem("roadmap")
+              document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;"
+              window.location.href = "/login"
+            }}
+            className="flex items-center gap-2 text-sm text-slate-400 hover:text-white mt-2 px-1 transition-colors w-full text-left"
+          >
+            <LogOut className="w-4 h-4" /> Logout
+          </button>
+
+          <button
+            onClick={async () => {
+              if (window.confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+                const stored = localStorage.getItem("user");
+                if (stored) {
+                  const user = JSON.parse(stored);
+                  try {
+                    await fetch(`/api/user/delete?email=${user.email}`, { method: 'DELETE' });
+                  } catch (e) {
+                    console.error("Delete failed", e);
+                  }
+                }
+
+                localStorage.clear();
+                document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;"
+                window.location.href = "/";
+              }
+            }}
+            className="flex items-center gap-2 text-sm text-red-500/70 hover:text-red-500 mt-2 px-1 transition-colors w-full text-left"
+          >
+            <Trash2 className="w-4 h-4" /> Delete Account
+          </button>
+
+          <ApiKeyDialog className="flex items-center gap-2 text-sm text-slate-400 hover:text-white mt-2 px-1 transition-colors cursor-pointer group" />
         </div>
       </div>
     </aside>

@@ -10,6 +10,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Slider } from "@/components/ui/slider"
 import { toast } from "sonner"
 import { Save, Loader2 } from "lucide-react"
+import { ApiKeyDialog } from "@/components/ApiKeyDialog"
 
 export default function SettingsPage() {
   const router = useRouter()
@@ -67,10 +68,14 @@ export default function SettingsPage() {
       setUser(updatedUser)
 
       // Trigger Roadmap Generation
+      const apiKey = localStorage.getItem("gemini_api_key");
+      const headers: any = { "Content-Type": "application/json" };
+      if (apiKey) headers["x-gemini-api-key"] = apiKey;
+
       const genRes = await fetch("/api/roadmap/generate", {
         method: "POST",
         body: JSON.stringify({ email: user.email }),
-        headers: { "Content-Type": "application/json" },
+        headers: headers,
       })
 
       if (!genRes.ok) {
@@ -196,6 +201,18 @@ export default function SettingsPage() {
               <Label htmlFor="t2" className="text-slate-300 cursor-pointer">6 Months</Label>
             </div>
           </RadioGroup>
+        </div>
+
+        {/* API Key Config */}
+        <div className="space-y-3">
+          <Label className="text-white font-semibold text-lg">AI Configuration</Label>
+          <div className="bg-[#1E293B] border border-slate-700 rounded-xl p-4 flex items-center justify-between">
+            <div>
+              <div className="text-white font-medium">Custom API Key</div>
+              <div className="text-slate-400 text-sm">Use your own Gemini API Key for higher rate limits.</div>
+            </div>
+            <ApiKeyDialog />
+          </div>
         </div>
 
         <div className="pt-6">

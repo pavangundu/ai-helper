@@ -34,6 +34,7 @@ export default function DashboardPage() {
   const [roadmapId, setRoadmapId] = useState<string>("")
   const [generating, setGenerating] = useState(false)
   const [roadmap, setRoadmap] = useState<any>(null)
+  const [progress, setProgress] = useState({ aptitude: 0, dsa: 0, core: 0 })
 
   useEffect(() => {
     const stored = localStorage.getItem("user")
@@ -57,6 +58,9 @@ export default function DashboardPage() {
       if (data.currentTask) {
         setCurrentTask(data.currentTask)
         setRoadmapId(data.roadmapId)
+      }
+      if (data.progress) {
+        setProgress(data.progress)
       }
     } catch (e) {
       console.error(e)
@@ -262,7 +266,7 @@ export default function DashboardPage() {
                     ? "bg-green-500/5 border-green-500/10 cursor-default"
                     : "bg-[#1E293B]/50 hover:border-blue-500/30 cursor-pointer"
                     }`}
-                    onClick={() => !isTaskDone(currentTask, "core") && markComplete("core")}>
+                    onClick={() => !isTaskDone(currentTask, "core") && router.push("/core-skills")}>
                     <div className="flex items-center gap-4">
                       <div className={`p-3 rounded-lg border ${isTaskDone(currentTask, "core")
                         ? "bg-green-500/10 border-green-500/20 text-green-500"
@@ -278,7 +282,16 @@ export default function DashboardPage() {
                     {isTaskDone(currentTask, "core") ? (
                       <Badge className="bg-green-500/20 text-green-400 border-green-500/30 px-3 py-1">Completed</Badge>
                     ) : (
-                      <Badge variant="outline" className="border-slate-700 text-slate-400 group-hover/task:bg-blue-500 group-hover/task:text-white group-hover/task:border-blue-500 transition-all">Mark Done</Badge>
+                      <div className="flex gap-2 items-center">
+                        <div role="button" className="text-sm font-medium text-green-400 hover:text-green-300 flex items-center gap-1 px-2 py-1 rounded hover:bg-green-400/10 transition-colors z-20"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            markComplete("core");
+                          }}>
+                          <CheckCircle className="w-4 h-4" /> Done
+                        </div>
+                        <Badge variant="outline" className="border-slate-700 text-slate-400 group-hover/task:bg-blue-500 group-hover/task:text-white group-hover/task:border-blue-500 transition-all">Start</Badge>
+                      </div>
                     )}
                   </div>
                 </>
@@ -381,15 +394,15 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent className="flex justify-around items-center px-4 py-8">
               <div className="flex flex-col items-center gap-3">
-                <ProgressRing progress={45} radius={42} stroke={6} color="text-blue-500" label="45%" />
+                <ProgressRing progress={progress.aptitude} radius={42} stroke={6} color="text-blue-500" label={`${progress.aptitude}%`} />
                 <span className="text-sm font-semibold text-slate-300 tracking-wide">Aptitude</span>
               </div>
               <div className="flex flex-col items-center gap-3">
-                <ProgressRing progress={60} radius={42} stroke={6} color="text-purple-500" label="60%" />
+                <ProgressRing progress={progress.dsa} radius={42} stroke={6} color="text-purple-500" label={`${progress.dsa}%`} />
                 <span className="text-sm font-semibold text-purple-300 tracking-wide">DSA</span>
               </div>
               <div className="flex flex-col items-center gap-3">
-                <ProgressRing progress={70} radius={42} stroke={6} color="text-emerald-500" label="70%" />
+                <ProgressRing progress={progress.core} radius={42} stroke={6} color="text-emerald-500" label={`${progress.core}%`} />
                 <span className="text-sm font-semibold text-emerald-300 tracking-wide">Core</span>
               </div>
             </CardContent>

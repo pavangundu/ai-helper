@@ -1,7 +1,7 @@
 
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
@@ -12,7 +12,7 @@ import { CheckCircle, XCircle, AlertCircle, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 import { ProgressRing } from "@/components/ui/progress-ring"
 
-export default function AptitudePracticePage() {
+function PracticeContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const topic = searchParams.get("topic") || "General Aptitude"
@@ -348,5 +348,18 @@ export default function AptitudePracticePage() {
         </CardFooter>
       </Card>
     </div>
+  )
+}
+
+export default function AptitudePracticePage() {
+  return (
+    <Suspense fallback={
+      <div className="flex flex-col items-center justify-center h-[60vh] space-y-4">
+        <Loader2 className="w-12 h-12 animate-spin text-blue-500" />
+        <p className="text-slate-400">Loading quiz environment...</p>
+      </div>
+    }>
+      <PracticeContent />
+    </Suspense>
   )
 }

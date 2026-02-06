@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils"
 export default function RoadmapPage() {
   const router = useRouter()
   const [roadmap, setRoadmap] = useState<any>(null)
+  const [progress, setProgress] = useState(0)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -28,6 +29,9 @@ export default function RoadmapPage() {
       if (res.ok) {
         const data = await res.json()
         setRoadmap(data.roadmap)
+        if (typeof data.percentCompleted === 'number') {
+          setProgress(data.percentCompleted)
+        }
       }
     } catch (error) {
       console.error(error)
@@ -95,7 +99,7 @@ export default function RoadmapPage() {
             </div>
             <div>
               <div className="text-xs text-slate-500 uppercase font-bold tracking-wider">Progress</div>
-              <div className="text-white font-bold">0% Completed</div>
+              <div className="text-white font-bold">{progress}% Completed</div>
             </div>
           </div>
         </div>

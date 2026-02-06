@@ -34,7 +34,8 @@ export async function POST(req: Request) {
       goalTimeline: user.goalTimeline || "3 months"
     };
 
-    const roadmapData = await generateRoadmap(profile);
+    const apiKey = req.headers.get("x-gemini-api-key") || undefined;
+    const roadmapData = await generateRoadmap(profile, apiKey);
 
     // Save to DB
     const newRoadmap = await Roadmap.create({

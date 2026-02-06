@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Slider } from "@/components/ui/slider"
 import { toast } from "sonner"
+import { ApiKeyDialog } from "@/components/ApiKeyDialog"
 
 const formSchema = z.object({
   targetRole: z.string().min(1, "Please select a target role."),
@@ -60,7 +61,10 @@ export default function ProfileSetupPage() {
         headers: { "Content-Type": "application/json" },
       })
 
-      if (!res.ok) throw new Error("Failed to update profile")
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to update profile");
+      }
 
       const data = await res.json()
 
@@ -68,10 +72,14 @@ export default function ProfileSetupPage() {
       localStorage.setItem("user", JSON.stringify(data.user))
 
       // Trigger Roadmap Generation
+      const apiKey = localStorage.getItem("gemini_api_key");
+      const headers: any = { "Content-Type": "application/json" };
+      if (apiKey) headers["x-gemini-api-key"] = apiKey;
+
       const genRes = await fetch("/api/roadmap/generate", {
         method: "POST",
         body: JSON.stringify({ email: userEmail }),
-        headers: { "Content-Type": "application/json" },
+        headers: headers,
       })
 
       if (!genRes.ok) {
@@ -252,6 +260,12 @@ export default function ProfileSetupPage() {
               <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-5 shadow-lg shadow-blue-900/20" disabled={loading}>
                 {loading ? "Generating Roadmap..." : "Generate AI Plan 🚀"}
               </Button>
+
+              <div className="flex justify-center">
+                <ApiKeyDialog
+                  trigger={<span className="text-xs text-slate-500 hover:text-blue-400 cursor-pointer transition-colors">I have my own Gemini API Key</span>}
+                />
+              </div>
             </form>
           </Form>
         </CardContent>

@@ -24,7 +24,6 @@ export async function POST(req: Request) {
       );
     }
 
-
     const isMatch = await bcrypt.compare(password, user.password!);
 
     if (!isMatch) {
@@ -33,9 +32,6 @@ export async function POST(req: Request) {
         { status: 401 }
       );
     }
-
-    // In a real app, successful login sets a cookie/session.
-    // For this prototype, we return the user info so the client can store it.
 
     return NextResponse.json(
       {
@@ -49,10 +45,10 @@ export async function POST(req: Request) {
       },
       { status: 200 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Login Error:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: `Login Failed: ${error.message}` },
       { status: 500 }
     );
   }
