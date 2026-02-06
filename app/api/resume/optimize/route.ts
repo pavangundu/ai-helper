@@ -41,7 +41,8 @@ export async function POST(req: Request) {
         - Ensure 'points' in projects is ALWAYS an array of strings.
       `;
 
-    const model = getGeminiModel();
+    const apiKey = req.headers.get("x-gemini-api-key") || undefined;
+    const model = getGeminiModel(apiKey);
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();

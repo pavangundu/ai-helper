@@ -24,7 +24,8 @@ export async function POST(req: Request) {
     }
     `;
 
-    const model = getGeminiModel();
+    const apiKey = req.headers.get("x-gemini-api-key") || undefined;
+    const model = getGeminiModel(apiKey);
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
