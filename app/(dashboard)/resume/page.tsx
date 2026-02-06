@@ -70,13 +70,10 @@ export default function ResumeBuilderPage() {
     if (!jobDescription.trim()) return;
     setIsOptimizing(true);
     try {
-      // Call API
-      const apiKey = localStorage.getItem("gemini_api_key") || "";
       const res = await fetch('/api/resume/optimize', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-gemini-api-key': apiKey
         },
         body: JSON.stringify({
           resumeData,

@@ -37,7 +37,6 @@ export default function MentorChatPage() {
     setLoading(true)
 
     try {
-      const apiKey = localStorage.getItem("gemini_api_key") || "";
       const res = await fetch("/api/mentor/chat", {
         method: "POST",
         body: JSON.stringify({
@@ -45,10 +44,7 @@ export default function MentorChatPage() {
           previousMessages: messages.slice(-5),
           userEmail: JSON.parse(localStorage.getItem("user") || "{}").email
         }),
-        headers: {
-          "Content-Type": "application/json",
-          "x-gemini-api-key": apiKey
-        }
+        headers: { "Content-Type": "application/json" }
       })
 
       const data = await res.json()

@@ -72,14 +72,14 @@ export default function ProfileSetupPage() {
       localStorage.setItem("user", JSON.stringify(data.user))
 
       // Trigger Roadmap Generation
-      const apiKey = localStorage.getItem("gemini_api_key") || "";
+      const apiKey = localStorage.getItem("gemini_api_key");
+      const headers: any = { "Content-Type": "application/json" };
+      if (apiKey) headers["x-gemini-api-key"] = apiKey;
+
       const genRes = await fetch("/api/roadmap/generate", {
         method: "POST",
         body: JSON.stringify({ email: userEmail }),
-        headers: {
-          "Content-Type": "application/json",
-          "x-gemini-api-key": apiKey
-        },
+        headers: headers,
       })
 
       if (!genRes.ok) {
