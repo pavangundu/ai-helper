@@ -64,11 +64,15 @@ function PracticeContent() {
           "x-gemini-api-key": localStorage.getItem("gemini_api_key") || ""
         }
       })
+      if (!res.ok) {
+        const errorData = await res.json()
+        throw new Error(errorData.error || "Failed to generate problem")
+      }
       const data = await res.json()
       setProblem(data)
       localStorage.setItem(`dsa_problem_${topic}`, JSON.stringify(data))
-    } catch (error) {
-      toast.error("Failed to load problem.")
+    } catch (error: any) {
+      toast.error(error.message || "Failed to load problem. Check API Key.")
     } finally {
       setLoading(false)
     }
